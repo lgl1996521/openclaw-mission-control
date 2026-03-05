@@ -6,7 +6,7 @@
  * agents/route.ts and models-summary.ts.
  */
 
-import { gatewayCall, isReadOnlyMode, ReadOnlyError } from "./openclaw";
+import { gatewayCall } from "./openclaw";
 
 // ── Helpers ──────────────────────────────────────
 
@@ -112,9 +112,6 @@ export async function patchConfig(
   patch: Record<string, unknown>,
   opts?: { maxAttempts?: number; restartDelayMs?: number },
 ): Promise<void> {
-  if (isReadOnlyMode()) {
-    throw new ReadOnlyError("config.patch");
-  }
   const maxAttempts = opts?.maxAttempts ?? 8;
   const raw = JSON.stringify(patch);
   let lastError: unknown = null;

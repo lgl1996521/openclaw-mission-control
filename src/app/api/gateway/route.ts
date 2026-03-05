@@ -10,9 +10,7 @@ const exec = promisify(execFile);
 // ── Auto-enable OpenResponses endpoint for streaming chat ──
 // Uses a cooldown to avoid restart loops: once attempted (success or fail),
 // waits RETRY_COOLDOWN_MS before trying again. Never resets on failure.
-// NOT gated by read-only mode — this is infrastructure setup. In read-only
-// mode the gatewayCall("config.patch") will throw ReadOnlyError and the
-// catch block handles it gracefully (streaming falls back to CLI).
+// Uses a cooldown to avoid restart loops (see issue #20).
 let _responsesEndpointEnsured = false;
 let _responsesLastAttempt = 0;
 const RESPONSES_RETRY_COOLDOWN_MS = 5 * 60_000; // 5 minutes
@@ -61,8 +59,7 @@ function ensureResponsesEndpoint(): void {
       );
       _responsesEndpointEnsured = true;
     } catch {
-      // Non-fatal — streaming falls back to CLI.
-      // In read-only mode this catches ReadOnlyError silently.
+      // Non-fatal — streaming falls back to non-streaming.
       // Do NOT reset _responsesEndpointEnsured; cooldown timer handles retry.
     } finally {
       _responsesSetupPromise = null;
