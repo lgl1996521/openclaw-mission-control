@@ -1413,6 +1413,23 @@ export function DashboardView() {
           </div>
           <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />
         </Link>
+        {/* ── Contact & support ── */}
+        {process.env.NEXT_PUBLIC_AGENTBAY_HOSTED === "true" && (
+          <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm dark:border-[#2c343d] dark:bg-[#171a1d]">
+            <h2 className="mb-2 flex items-center gap-2 text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground">
+              Need help?
+            </h2>
+            <p className="text-xs text-stone-600 dark:text-[#a8b0ba]">
+              Questions, feedback, or issues? Reach out anytime:
+            </p>
+            <a
+              href="mailto:roberto.sannazzaro@gmail.com"
+              className="mt-2 inline-flex items-center gap-2 text-sm font-medium text-emerald-700 transition-colors hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300"
+            >
+              roberto.sannazzaro@gmail.com
+            </a>
+          </div>
+        )}
         {/* ── Build info ── */}
         <div className="pt-2 text-center text-[10px] text-muted-foreground/30">
           Mission Control {process.env.NEXT_PUBLIC_APP_VERSION}
