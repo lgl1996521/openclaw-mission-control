@@ -403,8 +403,11 @@ export async function POST(request: NextRequest) {
       if (!is404) throw gwErr;
 
       const bin = await getOpenClawBin();
-      const args = ["memory", "index"];
-      if (force) args.push("--force");
+      // `openclaw memory index` supports --agent and --verbose only (no --force).
+      // For force-reindex, use `memory status --deep --index` which reindexes dirty stores.
+      const args = force
+        ? ["memory", "status", "--deep", "--index"]
+        : ["memory", "index"];
       if (agentId) args.push("--agent", agentId);
       await exec(bin, args, {
         timeout: 60000,
