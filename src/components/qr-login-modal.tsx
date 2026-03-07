@@ -38,13 +38,15 @@ export function QrLoginModal({
   const eventSourceRef = useRef<EventSource | null>(null);
   const mountedRef = useRef(true);
   const notifiedSuccessRef = useRef(false);
+  const onSuccessRef = useRef(onSuccess);
+  onSuccessRef.current = onSuccess;
 
   const finishSuccess = useCallback(() => {
     if (notifiedSuccessRef.current) return;
     notifiedSuccessRef.current = true;
     setState("success");
-    onSuccess?.();
-  }, [onSuccess]);
+    onSuccessRef.current?.();
+  }, []);
 
   const closeStream = useCallback(() => {
     eventSourceRef.current?.close();
@@ -118,14 +120,15 @@ export function QrLoginModal({
             return;
         }
       } catch {
-        // Ignore malformed stream payloads.
+        // Log but don't crash on malformed payloads
+        setLogs((prev) => [...prev.slice(-49), "[warning] Received malformed data from server"]);
       }
     };
 
     es.onerror = () => {
       if (!mountedRef.current || notifiedSuccessRef.current) return;
       setState("error");
-      setErrorMessage("Could not connect to the login session.");
+      setErrorMessage("Connection lost. Make sure the OpenClaw gateway is running and try again.");
       closeStream();
     };
   }, [account, channel, closeStream, finishSuccess]);
@@ -171,7 +174,8 @@ export function QrLoginModal({
         {state === "scanning" && qrText && (
           <div className="flex flex-col items-center gap-4">
             <p className="text-center text-xs text-muted-foreground">
-              Scan this QR code with your <span className="font-medium text-foreground">{label}</span> app
+              Open <span className="font-medium text-foreground">{label}</span> on your phone and scan this QR code.
+              Keep this window open — it will move to the next step automatically.
             </p>
             <div className="rounded-lg border border-foreground/10 bg-white p-3">
               <pre
@@ -185,7 +189,7 @@ export function QrLoginModal({
               </pre>
             </div>
             <p className="text-center text-[11px] text-muted-foreground/60">
-              QR code refreshes automatically. Keep this window open until login completes.
+              The QR code refreshes automatically every few seconds. This session expires after 2 minutes.
             </p>
           </div>
         )}

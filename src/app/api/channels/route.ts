@@ -209,9 +209,13 @@ export async function POST(request: NextRequest) {
         }
 
         // Disable and clear credentials
-        const clearPatch: Record<string, unknown> = { enabled: false };
+        const clearPatch: Record<string, unknown> = { enabled: false, dmPolicy: "", groupPolicy: "" };
         if (channel === "telegram") clearPatch.botToken = "";
         if (channel === "discord") clearPatch.token = "";
+        if (channel === "whatsapp") {
+          clearPatch.dmPolicy = "";
+          clearPatch.groupPolicy = "";
+        }
 
         await patchConfig(
           { channels: { [channel]: clearPatch } },
