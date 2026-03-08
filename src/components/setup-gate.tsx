@@ -137,7 +137,7 @@ export function SetupGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (error) {
+  if (error && !skipped) {
     return (
       <SetupGateContext.Provider value={{ invalidate: handleComplete }}>
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background px-4">

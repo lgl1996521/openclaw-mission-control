@@ -1434,7 +1434,6 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
                           type="button"
                           onClick={() => {
                             skipOnboarding();
-                            onComplete?.();
                           }}
                           className="rounded-full bg-amber-600 px-4 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
                         >
