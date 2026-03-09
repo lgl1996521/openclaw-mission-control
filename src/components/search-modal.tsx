@@ -89,7 +89,7 @@ const quickActions: QuickAction[] = [
   { id: "memory", label: "Memory", group: "Knowledge", href: "/memory", icon: Brain, keywords: ["knowledge", "notes", "journal"] },
   { id: "docs", label: "Documents", group: "Knowledge", href: "/documents", icon: FolderOpen, keywords: ["files", "uploads"] },
   { id: "vectors", label: "Vector DB", group: "Knowledge", href: "/vectors", icon: Database, keywords: ["embeddings", "semantic", "index"] },
-  { id: "models", label: "Models", group: "Configure", href: "/models", icon: Cpu, keywords: ["llm", "ai", "gpt", "claude"] },
+  { id: "models", label: "Models", group: "Agents", href: "/agents?tab=models", icon: Cpu, keywords: ["llm", "ai", "gpt", "claude"] },
   { id: "accounts", label: "API Keys", group: "Configure", href: "/accounts", icon: KeyRound, keywords: ["credentials", "tokens", "auth"] },
   { id: "security", label: "Security", group: "Configure", href: "/security", icon: ShieldCheck, keywords: ["permissions", "access"] },
   { id: "hooks", label: "Hooks", group: "Configure", href: "/hooks", icon: Webhook, keywords: ["events", "triggers", "automation"] },

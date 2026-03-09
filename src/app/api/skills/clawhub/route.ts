@@ -179,10 +179,18 @@ async function uninstallWorkspaceSkill(slug: string): Promise<{
   return { removedDir, removedLock };
 }
 
+function shellEscape(arg: string): string {
+  return "'" + arg.replace(/'/g, "'\\''") + "'";
+}
+
 async function runClawHub(args: string[], timeout = 30000): Promise<{ stdout: string; stderr: string }> {
   const workspace = getDefaultWorkspaceSync();
   const fullArgs = ["--no-input", "--workdir", workspace, ...args];
-  const { stdout, stderr } = await exec("clawhub", fullArgs, {
+  // Spawn through a login shell so the user's PATH (from ~/.zshrc, ~/.bash_profile, etc.)
+  // is available — fixes "clawhub not found" when the Next.js process has a limited env.
+  const shell = process.env.SHELL || "/bin/sh";
+  const cmd = ["clawhub", ...fullArgs.map(shellEscape)].join(" ");
+  const { stdout, stderr } = await exec(shell, ["-lc", cmd], {
     cwd: workspace,
     timeout,
     env: { ...process.env, NO_COLOR: "1", OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: "1" },

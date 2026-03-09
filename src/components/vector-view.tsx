@@ -414,19 +414,7 @@ function EmbeddingModelEditor({
                   </div>
                 ))}
               </div>
-              <div className="mt-2 rounded-lg border border-foreground/10 bg-muted/30 px-3 py-2.5">
-                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <KeyRound className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-300" />
-                  Authenticate providers via the onboarding wizard (API keys; no plugins required):
-                </p>
-                <ul className="mt-1.5 pl-5 space-y-1 text-xs font-mono text-muted-foreground/70 list-disc">
-                  {lockedProviders.map((p) => (
-                    <li key={p}>
-                      <code className="rounded bg-muted px-1 py-0.5 text-emerald-700 dark:text-emerald-300">{authCommandForProvider(p)}</code>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+
             </div>
           )}
         </>
@@ -991,7 +979,7 @@ export function VectorView() {
           ) : authProviders.includes("openai") ? (
             <span>Current provider is <span className="font-mono">{curProv || "—"}/{curModel || "—"}</span>. OpenAI is available — click Change below to use it for embeddings.</span>
           ) : curProv ? (
-            <span>Current: <span className="font-mono">{curProv}/{curModel}</span>. To add OpenAI for embeddings, run <code className="rounded bg-muted px-1 py-0.5 text-emerald-700 dark:text-emerald-300">openclaw onboard --auth-choice openai-api-key</code> then refresh.</span>
+            <span>Current: <span className="font-mono">{curProv}/{curModel}</span></span>
           ) : (
             <span>No embedding provider set. Use &quot;Or configure manually&quot; below with provider <span className="font-mono">openai</span> and model <span className="font-mono">text-embedding-3-small</span> after running <code className="rounded bg-muted px-1 py-0.5 text-emerald-700 dark:text-emerald-300">openclaw onboard --auth-choice openai-api-key</code>.</span>
           )}
@@ -1013,9 +1001,9 @@ export function VectorView() {
           <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-1.5"><Filter className="h-3 w-3 text-muted-foreground/60" /><span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60">Filters</span></div>
             <select value={searchAgent} onChange={(e) => setSearchAgent(e.target.value)} aria-label="Filter by namespace" className="rounded-md border border-foreground/10 bg-muted px-2.5 py-1.5 text-xs text-foreground/70 outline-none"><option value="">All namespaces</option>{agents.map((a) => <option key={a.agentId} value={a.agentId}>{a.agentId}</option>)}</select>
-            <div className="flex items-center gap-1.5"><span className="text-xs text-muted-foreground/60">Top-K:</span><select value={maxResults} onChange={(e) => setMaxResults(e.target.value)} aria-label="Top-K results" className="rounded-md border border-foreground/10 bg-muted px-2 py-1.5 text-xs text-foreground/70 outline-none">{["3","5","10","20","50"].map((v) => <option key={v} value={v}>{v}</option>)}</select></div>
+            <div className="flex items-center gap-1.5"><span className="text-xs text-muted-foreground/60">Top-K:</span><select value={maxResults} onChange={(e) => setMaxResults(e.target.value)} aria-label="Top-K results" className="rounded-md border border-foreground/10 bg-muted px-2 py-1.5 text-xs text-foreground/70 outline-none">{["3", "5", "10", "20", "50"].map((v) => <option key={v} value={v}>{v}</option>)}</select></div>
             <div className="flex items-center gap-1.5"><span className="text-xs text-muted-foreground/60">Min score:</span><input type="number" step="0.05" min="0" max="1" value={minScore} onChange={(e) => setMinScore(e.target.value)} placeholder="0.0" aria-label="Minimum score threshold" className="w-16 rounded-md border border-foreground/10 bg-muted px-2 py-1.5 text-xs text-foreground/70 outline-none" /></div>
-            <div className="flex items-center gap-1.5"><ArrowUpDown className="h-3 w-3 text-muted-foreground/60" /><select value={sortBy} onChange={(e) => setSortBy(e.target.value as "score"|"path")} aria-label="Sort results by" className="rounded-md border border-foreground/10 bg-muted px-2 py-1.5 text-xs text-foreground/70 outline-none"><option value="score">By score</option><option value="path">By path</option></select></div>
+            <div className="flex items-center gap-1.5"><ArrowUpDown className="h-3 w-3 text-muted-foreground/60" /><select value={sortBy} onChange={(e) => setSortBy(e.target.value as "score" | "path")} aria-label="Sort results by" className="rounded-md border border-foreground/10 bg-muted px-2 py-1.5 text-xs text-foreground/70 outline-none"><option value="score">By score</option><option value="path">By path</option></select></div>
           </div>
           {lastQuery && <div className="flex items-center gap-3 text-xs text-muted-foreground"><span>{results.length} result{results.length !== 1 ? "s" : ""} for <span className="font-medium text-emerald-700 dark:text-emerald-300">{"\u201C"}{lastQuery}{"\u201D"}</span></span><span className="text-muted-foreground/40">&middot;</span><span>{searchTime}ms</span>{results.length > 0 && <><span className="text-muted-foreground/40">&middot;</span><span>top: <span className={cn("font-mono", scoreColor(results[0].score))}>{results[0].score.toFixed(4)}</span></span></>}</div>}
         </div>
@@ -1049,7 +1037,7 @@ export function VectorView() {
           <div className="flex items-center justify-between gap-2">
             <div>
               <div className="flex items-center gap-2 text-sm font-semibold text-foreground/90"><FileText className="h-4 w-4 text-stone-700 dark:text-[#d6dce3]" />Workspace reference files</div>
-              <p className="text-xs text-muted-foreground mt-0.5">Include all root-level <code className="rounded bg-muted px-1 text-xs">.md</code> files in semantic search so the index covers your full workspace knowledge, not just <code className="rounded bg-muted px-1 text-xs">memory/</code>.</p>
+
             </div>
             <button type="button" onClick={handleEnsureExtraPaths} disabled={ensuringExtraPaths} className="shrink-0 flex items-center gap-1.5 rounded-lg bg-primary text-primary-foreground px-3 py-2 text-xs font-medium hover:bg-primary/90 disabled:opacity-50">
               {ensuringExtraPaths ? <span className="inline-flex items-center gap-0.5"><span className="h-1 w-1 animate-bounce rounded-full bg-current [animation-delay:0ms]" /><span className="h-1 w-1 animate-bounce rounded-full bg-current [animation-delay:150ms]" /><span className="h-1 w-1 animate-bounce rounded-full bg-current [animation-delay:300ms]" /></span> : <FileText className="h-3.5 w-3.5" />}
@@ -1058,21 +1046,9 @@ export function VectorView() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-foreground/10 bg-foreground/5 p-4 space-y-2">
-          <div className="flex items-center gap-2 text-sm font-semibold text-foreground/90"><Settings2 className="h-4 w-4 text-muted-foreground" />How It Works</div>
-          <div className="text-xs text-muted-foreground space-y-1">
-            <p>OpenClaw indexes workspace <code className="rounded bg-foreground/10 px-1 text-xs text-muted-foreground">memory/</code> files into SQLite with vector embeddings (sqlite-vec). Use &quot;Include reference files in search&quot; above to also index root-level <code className="rounded bg-foreground/10 px-1 text-xs text-muted-foreground">.md</code> files.</p>
-            <p>Each file is chunked and embedded using the configured model (default: text-embedding-3-small, 1536d). Search uses cosine similarity. FTS5 is available as fallback.</p>
-          </div>
-          <div className="rounded-lg bg-muted p-3 font-mono text-xs text-muted-foreground space-y-0.5">
-            <p><span className="text-emerald-700 dark:text-emerald-300">openclaw memory status</span> <span className="text-muted-foreground/60"># Index status</span></p>
-            <p><span className="text-emerald-700 dark:text-emerald-300">openclaw memory index</span> <span className="text-muted-foreground/60"># Incremental reindex</span></p>
-            <p><span className="text-emerald-700 dark:text-emerald-300">openclaw memory index --force</span> <span className="text-muted-foreground/60"># Full reindex</span></p>
-            <p><span className="text-emerald-700 dark:text-emerald-300">openclaw memory search &quot;query&quot;</span> <span className="text-muted-foreground/60"># Semantic search</span></p>
-          </div>
-        </div>
+
       </SectionBody>
       {toast && <ToastBar toast={toast} onDone={() => setToast(null)} />}
-    </SectionLayout>
+    </SectionLayout >
   );
 }

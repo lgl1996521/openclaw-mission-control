@@ -8,6 +8,8 @@ type Snapshot = {
   health: GatewayHealth;
   restarting: boolean;
   latencyMs: number | null;
+  /** True once at least one full poll cycle has completed (success or failure). */
+  initialCheckDone: boolean;
 };
 
 const RESTART_EVENT = "gateway-restarting";
@@ -17,6 +19,7 @@ let snapshot: Snapshot = {
   health: null,
   restarting: false,
   latencyMs: null,
+  initialCheckDone: false,
 };
 
 const SERVER_SNAPSHOT: Snapshot = {
@@ -24,6 +27,7 @@ const SERVER_SNAPSHOT: Snapshot = {
   health: null,
   restarting: false,
   latencyMs: null,
+  initialCheckDone: false,
 };
 
 const VALID_STATUSES = new Set<GatewayStatus>(["online", "degraded", "offline", "loading"]);
@@ -203,6 +207,7 @@ async function start() {
   // Fast preflight via /api/status (3s max) then full health data (sequenced to avoid race)
   await pollLite();
   await poll();
+  setSnapshot({ initialCheckDone: true });
   switchToNormalPolling();
 }
 

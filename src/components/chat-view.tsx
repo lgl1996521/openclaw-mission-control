@@ -496,7 +496,7 @@ function ChatPanel({
                     Connect an AI provider and choose a model to start chatting with your agent.
                   </p>
                   <a
-                    href="/models"
+                    href="/agents?tab=models"
                     className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[var(--accent-brand)] px-4 py-2 text-xs font-medium text-[var(--accent-brand-on)] shadow-sm transition-all hover:opacity-90 hover:shadow-md"
                   >
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -693,7 +693,7 @@ function ChatPanel({
                     is missing, expired, or doesn&apos;t have enough credits.
                   </p>
                   <a
-                    href="/models"
+                    href="/agents?tab=models"
                     className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--accent-brand)] px-3 py-1.5 text-xs font-medium text-[var(--accent-brand-on)] shadow-sm transition-all hover:opacity-90"
                   >
                     <ArrowRight className="h-3 w-3" />

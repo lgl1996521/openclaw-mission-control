@@ -29,12 +29,7 @@ import {
   SectionLayout,
 } from "@/components/section-layout";
 import { LoadingState } from "@/components/ui/loading-state";
-import {
-  setAutoRestartOnChanges,
-  subscribeAutoRestartPreference,
-  getAutoRestartSnapshot,
-  getAutoRestartServerSnapshot,
-} from "@/lib/auto-restart-preference";
+
 import {
   setTimeFormatPreference,
   subscribeTimeFormatPreference,
@@ -141,12 +136,6 @@ export function SettingsView() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  // Auto-restart preference from existing store
-  const autoRestart = useSyncExternalStore(
-    subscribeAutoRestartPreference,
-    getAutoRestartSnapshot,
-    getAutoRestartServerSnapshot,
-  );
   const timeFormat = useSyncExternalStore(
     subscribeTimeFormatPreference,
     getTimeFormatSnapshot,
@@ -518,17 +507,6 @@ export function SettingsView() {
                 </>
               )}
             </div>
-          </SettingRow>
-
-          {/* Auto-restart */}
-          <SettingRow
-            label="Auto-restart gateway on config changes"
-            description="When enabled, the gateway restarts automatically after configuration changes instead of showing a prompt."
-          >
-            <ToggleSwitch
-              checked={autoRestart}
-              onChange={setAutoRestartOnChanges}
-            />
           </SettingRow>
 
         </SettingsSection>

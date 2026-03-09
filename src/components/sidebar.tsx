@@ -51,6 +51,7 @@ type NavItem = {
   tab?: string;
   isSubItem?: boolean;
   comingSoon?: boolean;
+  beta?: boolean;
   group?: string;
 };
 
@@ -64,12 +65,13 @@ const navItems: NavItem[] = [
   // ── Agents ──
   { group: "Agents", section: "agents", label: "Agents", icon: Users, href: "/agents" },
   { section: "agents", label: "Subagents", icon: Users2, href: "/agents?tab=subagents", tab: "subagents", isSubItem: true },
+  { section: "agents", label: "Models", icon: Cpu, href: "/agents?tab=models", tab: "models", isSubItem: true },
   { section: "chat", label: "Chat", icon: MessageCircle, href: "/chat" },
   { section: "sessions", label: "Sessions", icon: MessageSquare, href: "/sessions" },
   // ── Work ──
   { group: "Work", section: "tasks", label: "Tasks", icon: ListChecks, href: "/tasks" },
-  ...(!isAgentbayHosting ? [{ section: "calendar", label: "Calendar", icon: Calendar, href: "/calendar" } as NavItem] : []),
-  ...(!isAgentbayHosting ? [{ section: "integrations", label: "Integrations", icon: Puzzle, href: "/integrations" } as NavItem] : []),
+  ...(!isAgentbayHosting ? [{ section: "calendar", label: "Calendar", icon: Calendar, href: "/calendar", beta: true } as NavItem] : []),
+  ...(!isAgentbayHosting ? [{ section: "integrations", label: "Integrations", icon: Puzzle, href: "/integrations", beta: true } as NavItem] : []),
   { section: "cron", label: "Cron Jobs", icon: Clock, href: "/cron" },
   { section: "cron", label: "Heartbeat", icon: Heart, href: "/heartbeat", tab: "heartbeat", isSubItem: true },
   { section: "skills", label: "Skills", icon: Wrench, href: "/skills" },
@@ -79,19 +81,18 @@ const navItems: NavItem[] = [
   { section: "docs", label: "Documents", icon: FolderOpen, href: "/documents" },
   { section: "vectors", label: "Vector DB", icon: Database, href: "/vectors" },
   // ── Configure ──
-  { group: "Configure", section: "models", label: "Models", icon: Cpu, href: "/models" },
   { section: "accounts", label: "API Keys", icon: KeyRound, href: "/accounts" },
   { section: "security", label: "Security", icon: ShieldCheck, href: "/security" },
   { section: "hooks", label: "Hooks", icon: Webhook, href: "/hooks" },
   { section: "settings", label: "Preferences", icon: Settings2, href: "/settings" },
   // ── System ──
-  ...(!isAgentbayHosting ? [{ section: "doctor", label: "Doctor", icon: Stethoscope, href: "/doctor", group: "System" } as NavItem] : []),
+  ...(!isAgentbayHosting ? [{ section: "doctor", label: "Doctor", icon: Stethoscope, href: "/doctor", group: "System", beta: true } as NavItem] : []),
   { group: isAgentbayHosting ? "System" : undefined, section: "terminal", label: "Terminal", icon: SquareTerminal, href: "/terminal" },
   { section: "logs", label: "Logs", icon: Terminal, href: "/logs" },
   { section: "browser", label: "Browser Relay", icon: Globe, href: "/browser" },
   { section: "audio", label: "Audio & Voice", icon: Volume2, href: "/audio" },
   { section: "search", label: "Web Search", icon: Search, href: "/search" },
-  ...(!isAgentbayHosting ? [{ section: "tailscale", label: "Tailscale", icon: Waypoints, href: "/tailscale" } as NavItem] : []),
+  ...(!isAgentbayHosting ? [{ section: "tailscale", label: "Tailscale", icon: Waypoints, href: "/tailscale", beta: true } as NavItem] : []),
   { section: "config", label: "Config", icon: Settings, href: "/config" },
   ...(isAgentbayHosting ? [{ section: "help" as const, label: "Help & Support", icon: HelpCircle, href: "/help" } as NavItem] : []),
 ];
@@ -116,6 +117,7 @@ function deriveSectionFromPath(pathname: string): string | null {
     memories: "memory",
     permissions: "security",
     heartbeat: "cron",
+    models: "agents",
   };
   if (aliases[first]) return aliases[first];
   const known = new Set([
@@ -132,7 +134,6 @@ function deriveSectionFromPath(pathname: string): string | null {
     "docs",
     "vectors",
     "skills",
-    "models",
     "accounts",
     "audio",
     "browser",
@@ -157,6 +158,7 @@ function deriveTabFromPath(pathname: string): string | null {
   if (!pathname || pathname === "/") return null;
   const first = pathname.split("/").filter(Boolean)[0] || "";
   if (first === "heartbeat") return "heartbeat";
+  if (first === "models") return "models";
   return null;
 }
 
@@ -178,7 +180,8 @@ function SidebarNav({ onNavigate, collapsed }: { onNavigate?: () => void; collap
   const isClawHubActive = section === "skills" && tab === "clawhub";
   const showSkillsChildren = isClawHubActive ? true : skillsExpanded;
   const isSubagentsActive = section === "agents" && tab === "subagents";
-  const showAgentsChildren = isSubagentsActive ? true : agentsExpanded;
+  const isModelsActive = section === "agents" && tab === "models";
+  const showAgentsChildren = isSubagentsActive || isModelsActive ? true : agentsExpanded;
   const isHeartbeatActive = section === "cron" && tab === "heartbeat";
   const showCronChildren = isHeartbeatActive ? true : cronExpanded;
 
@@ -208,7 +211,10 @@ function SidebarNav({ onNavigate, collapsed }: { onNavigate?: () => void; collap
         const isActive =
           !item.comingSoon &&
           section === item.section &&
-          (item.tab ? tab === item.tab : item.section !== "skills" || tab !== "clawhub");
+          (item.tab
+            ? tab === item.tab
+            : (item.section !== "skills" || tab !== "clawhub") &&
+              (item.section !== "agents" || (tab !== "subagents" && tab !== "models")));
         const showBadge = item.section === "chat" && chatUnread > 0;
         const isDisabled = item.comingSoon;
         const linkClass = cn(
@@ -298,6 +304,11 @@ function SidebarNav({ onNavigate, collapsed }: { onNavigate?: () => void; collap
                   )}
                 </span>
                 {!collapsed && <span className="flex-1">{item.label}</span>}
+                {!collapsed && item.beta && (
+                    <span className="shrink-0 rounded-sm bg-stone-100 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-stone-400 dark:bg-[#1c2128] dark:text-[#5a6270]">
+                      beta
+                    </span>
+                  )}
                 {!collapsed && showBadge && (
                     <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-stone-900 px-1.5 text-xs font-bold text-white shadow-sm dark:bg-stone-100 dark:text-stone-900">
                       {chatUnread > 9 ? "9+" : chatUnread}

@@ -19,7 +19,7 @@ const SECTION_TO_PATH: Record<string, string> = {
   config: "/config",
   settings: "/config",
   skills: "/skills",
-  models: "/models",
+  models: "/agents?tab=models",
   accounts: "/accounts",
   audio: "/audio",
   vectors: "/vectors",

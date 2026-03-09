@@ -14,6 +14,15 @@ import {
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxContent,
+  ComboboxList,
+  ComboboxItem,
+  ComboboxEmpty,
+} from "@/components/ui/combobox";
+import { getFriendlyModelName } from "@/lib/model-metadata";
 
 type Model = { id: string; name: string };
 
@@ -493,20 +502,39 @@ export function OnboardingWizard({ onComplete }: Props) {
                 <label className="block text-xs font-medium uppercase tracking-wide text-stone-400 dark:text-[#5a6270]">
                   Model
                 </label>
-                <select
-                  value={selectedModel}
-                  onChange={(e) => setSelectedModel(e.target.value)}
-                  disabled={!validated || models.length === 0}
-                  className="w-full rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-[#0d1014] border border-stone-200 dark:border-[#23282e] text-stone-900 dark:text-[#f5f7fa] focus:outline-none focus:ring-2 focus:ring-stone-400/40 dark:focus:ring-stone-500/30 focus:border-stone-400 dark:focus:border-stone-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 appearance-none"
-                >
-                  {models.length === 0 ? (
-                    <option value="">Validate your API key first</option>
-                  ) : (
-                    models.map((m) => (
-                      <option key={m.id} value={m.id}>{m.name}</option>
-                    ))
-                  )}
-                </select>
+                {!validated || models.length === 0 ? (
+                  <div className="w-full rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-[#0d1014] border border-stone-200 dark:border-[#23282e] text-stone-400 dark:text-[#5a6270] opacity-40 cursor-not-allowed">
+                    Validate your API key first
+                  </div>
+                ) : (
+                  <Combobox
+                    items={models}
+                    value={models.find((m) => m.id === selectedModel) ?? null}
+                    onValueChange={(val) => setSelectedModel(val?.id ?? "")}
+                    itemToStringLabel={(m) => getFriendlyModelName(m.id)}
+                    itemToStringValue={(m) => `${getFriendlyModelName(m.id)} ${m.name} ${m.id}`}
+                  >
+                    <ComboboxInput
+                      placeholder="Search models..."
+                      className="w-full"
+                    />
+                    <ComboboxContent>
+                      <ComboboxEmpty>No models match your search.</ComboboxEmpty>
+                      <ComboboxList>
+                        {(model) => (
+                          <ComboboxItem key={model.id} value={model}>
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-sm font-medium">{getFriendlyModelName(model.id)}</span>
+                              {getFriendlyModelName(model.id) !== model.id && (
+                                <span className="font-mono text-[11px] text-muted-foreground">{model.id}</span>
+                              )}
+                            </div>
+                          </ComboboxItem>
+                        )}
+                      </ComboboxList>
+                    </ComboboxContent>
+                  </Combobox>
+                )}
               </div>
 
               <div className="flex justify-end pt-1">
@@ -720,20 +748,15 @@ export function OnboardingWizard({ onComplete }: Props) {
                               DM pairing
                             </span>
                           </div>
+                          {(req.senderName || req.senderId) && (
+                            <p className="mt-1 text-sm font-medium text-stone-700 dark:text-[#d6dce3]">
+                              {req.senderName || req.senderId}
+                            </p>
+                          )}
                           <div className="mt-1.5 flex flex-wrap items-center gap-2">
                             <code className="rounded-md bg-violet-500/10 dark:bg-violet-500/15 px-2 py-0.5 text-xs font-bold tracking-widest text-violet-600 dark:text-violet-300 ring-1 ring-violet-200 dark:ring-violet-500/20">
                               {req.code}
                             </code>
-                            {req.senderName && (
-                              <span className="text-xs text-stone-500 dark:text-[#a8b0ba]">
-                                from {req.senderName}
-                              </span>
-                            )}
-                            {!req.senderName && req.senderId && (
-                              <span className="text-xs text-stone-500 dark:text-[#a8b0ba]">
-                                ID: {req.senderId}
-                              </span>
-                            )}
                           </div>
                           {req.message && (
                             <p className="mt-1.5 line-clamp-1 text-xs text-stone-400 dark:text-[#5a6270] italic">

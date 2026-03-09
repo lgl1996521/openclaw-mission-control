@@ -6,7 +6,6 @@ import { Header, AgentChatPanel } from "@/components/header";
 import { KeyboardShortcuts } from "@/components/keyboard-shortcuts";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ChatNotificationToast } from "@/components/chat-notification-toast";
-import { RestartAnnouncementBar } from "@/components/restart-announcement-bar";
 
 import { SetupGate } from "@/components/setup-gate";
 import { UsageAlertMonitor } from "@/components/usage-alert-monitor";
@@ -110,7 +109,6 @@ export default function RootLayout({
               <Sidebar />
               <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
                 <Header />
-                <RestartAnnouncementBar />
                 <main className="flex flex-1 overflow-hidden bg-stone-50 dark:bg-[#101214]">
                   {children}
                 </main>

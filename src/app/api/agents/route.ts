@@ -829,7 +829,9 @@ export async function POST(request: NextRequest) {
               allowAgents: subs,
             };
           } else {
-            delete agent.subagents;
+            // Explicitly set empty allowAgents so the patch clears it
+            // (deleting the key won't override during a config merge).
+            agent.subagents = { allowAgents: [] };
           }
         }
 

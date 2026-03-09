@@ -56,10 +56,6 @@ const LogsView = dynamic(
   () => import("@/components/logs-view").then((m) => m.LogsView),
   { loading: () => <SectionLoading /> }
 );
-const ModelsView = dynamic(
-  () => import("@/components/models-view").then((m) => m.ModelsView),
-  { loading: () => <SectionLoading /> }
-);
 const AudioView = dynamic(
   () => import("@/components/audio-view").then((m) => m.AudioView),
   { loading: () => <SectionLoading /> }
@@ -190,7 +186,7 @@ function SectionContent({ section }: { section: DashboardSection }) {
     case "skills":
       return <SkillsView />;
     case "models":
-      return <ModelsView />;
+      return <AgentsView />;
     case "accounts":
       return <AccountsKeysView />;
     case "audio":

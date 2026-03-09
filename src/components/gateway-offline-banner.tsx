@@ -4,9 +4,9 @@ import { useGatewayStatusStore } from "@/lib/gateway-status-store";
 import { WifiOff } from "lucide-react";
 
 export function GatewayOfflineBanner() {
-  const { status, restarting } = useGatewayStatusStore();
+  const { status, restarting, initialCheckDone } = useGatewayStatusStore();
 
-  if (status === "online" || status === "loading") return null;
+  if (status === "online" || status === "loading" || !initialCheckDone) return null;
 
   const isOffline = status === "offline";
 

@@ -944,8 +944,10 @@ export function ModelsView() {
 
         <SectionBody width="content" padding="regular">
           <div className="space-y-6">
-            {/* Active model banner */}
-            <ActiveModelBanner model={primaryModel} onAddProvider={() => setShowWizard(true)} />
+            {/* Active model banner — only show after data loads */}
+            {summary !== null && (
+              <ActiveModelBanner model={primaryModel} onAddProvider={() => setShowWizard(true)} />
+            )}
 
             {/* Connected providers */}
             {configuredProviders.length > 0 && (
