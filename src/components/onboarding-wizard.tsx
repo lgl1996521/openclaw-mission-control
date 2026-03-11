@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, type CSSProperties } from "react";
 import { useSmartPoll } from "@/hooks/use-smart-poll";
 import {
   Check,
@@ -935,7 +935,8 @@ export function OnboardingWizard({ onComplete }: Props) {
           )}
 
           {step === 3 && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="relative space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+              {approved && <OnboardingSuccessFireworks />}
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2 mb-1">
                   <ShieldCheck className="h-3.5 w-3.5 text-stone-400 dark:text-[#a8b0ba]" />
@@ -1126,6 +1127,85 @@ function PairingWaitState({ configuredChannels, botNames }: { configuredChannels
         ))}
       </div>
     </div>
+  );
+}
+
+function OnboardingSuccessFireworks() {
+  const bursts = [
+    { x: "14%", y: "24%", delay: 0 },
+    { x: "50%", y: "12%", delay: 140 },
+    { x: "86%", y: "28%", delay: 280 },
+  ];
+  const colors = ["#22c55e", "#14b8a6", "#3b82f6", "#f59e0b", "#ec4899", "#a855f7"];
+  const particlesPerBurst = 14;
+
+  return (
+    <>
+      <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
+        {bursts.map((burst, burstIndex) => (
+          <div
+            key={`${burst.x}-${burst.y}`}
+            className="absolute"
+            style={{ left: burst.x, top: burst.y }}
+          >
+            {Array.from({ length: particlesPerBurst }).map((_, i) => {
+              const angle = Math.round((360 / particlesPerBurst) * i);
+              const distance = 54 + (i % 4) * 14;
+              const delay = burst.delay + i * 20;
+              const particleStyle = {
+                "--fw-angle": `${angle}deg`,
+                "--fw-distance": `${distance}px`,
+                animationDelay: `${delay}ms`,
+                backgroundColor: colors[(i + burstIndex) % colors.length],
+              } as CSSProperties & Record<`--${string}`, string>;
+
+              return (
+                <span
+                  key={`${burstIndex}-${i}`}
+                  className="onboarding-firework-particle"
+                  style={particleStyle}
+                />
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
+      <style jsx>{`
+        .onboarding-firework-particle {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 5px;
+          height: 12px;
+          border-radius: 9999px;
+          opacity: 0;
+          transform: translate(-50%, -50%) rotate(var(--fw-angle)) translateY(0) scale(0.65);
+          animation: onboarding-firework-burst 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes onboarding-firework-burst {
+          0% {
+            opacity: 0;
+            transform: translate(-50%, -50%) rotate(var(--fw-angle)) translateY(0) scale(0.65);
+          }
+          14% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 0;
+            transform: translate(-50%, -50%) rotate(var(--fw-angle)) translateY(calc(var(--fw-distance) * -1)) scale(1);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .onboarding-firework-particle {
+            animation: none;
+            opacity: 0;
+          }
+        }
+      `}</style>
+    </>
   );
 }
 

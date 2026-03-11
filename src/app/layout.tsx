@@ -12,6 +12,7 @@ import { UsageAlertMonitor } from "@/components/usage-alert-monitor";
 import { OpenClawUpdateBanner } from "@/components/openclaw-update-banner";
 import { CliModeBanner } from "@/components/cli-mode-banner";
 import { ToastRenderer } from "@/components/toast-renderer";
+import { DashboardTourGate } from "@/components/dashboard-tour-gate";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -120,11 +121,15 @@ export default function RootLayout({
               <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
                 <Header />
                 <CliModeBanner />
-                <main className="flex flex-1 overflow-hidden bg-stone-50 dark:bg-[#101214]">
+                <main
+                  data-tour="main-content"
+                  className="flex flex-1 overflow-hidden bg-stone-50 dark:bg-[#101214]"
+                >
                   {children}
                 </main>
               </div>
             </div>
+            <DashboardTourGate />
             <AgentChatPanel />
             <ChatNotificationToast />
             {!isHosted && <OpenClawUpdateBanner />}

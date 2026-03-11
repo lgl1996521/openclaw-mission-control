@@ -50,7 +50,8 @@ export async function usageDbExec(sql: string): Promise<void> {
 
 export async function usageDbQuery<T>(sql: string): Promise<T[]> {
   await ensureUsageDb();
-  const stdout = await sqlite(["-json", DB_PATH, PRAGMA_PREFIX + sql]);
+  // Use sqlite shell timeout command so JSON output stays parseable.
+  const stdout = await sqlite(["-cmd", ".timeout 5000", "-json", DB_PATH, sql]);
   const trimmed = (stdout || "").trim();
   if (!trimmed) return [];
   try {

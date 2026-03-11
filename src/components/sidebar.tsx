@@ -252,6 +252,20 @@ function SidebarNav({ onNavigate, collapsed }: { onNavigate?: () => void; collap
             ? tab === item.tab
             : (item.section !== "skills" || tab !== "clawhub") &&
               (item.section !== "agents" || (tab !== "subagents" && tab !== "models")));
+        const tourId =
+          !item.isSubItem && item.section === "dashboard"
+            ? "nav-dashboard"
+            : !item.isSubItem && item.section === "chat"
+              ? "nav-chat"
+              : !item.isSubItem && item.section === "tasks"
+                ? "nav-tasks"
+                : !item.isSubItem && item.section === "skills" && item.label === "Skills"
+                  ? "nav-skills"
+                  : !item.isSubItem && item.section === "accounts"
+                    ? "nav-accounts"
+                    : !item.isSubItem && item.section === "channels"
+                      ? "nav-channels"
+                      : undefined;
 
         if (collapsed && item.isSubItem) return null;
         if (item.isSubItem && item.section === "skills" && !showSkillsChildren) return null;
@@ -263,9 +277,9 @@ function SidebarNav({ onNavigate, collapsed }: { onNavigate?: () => void; collap
         const showBadge = item.section === "chat" && chatUnread > 0;
         const isDisabled = item.comingSoon;
         const linkClass = cn(
-          "group relative flex items-center gap-2.5 rounded-md py-1.5 text-sm font-medium transition-colors duration-150",
+          "group relative flex items-center gap-2 rounded-md py-1.5 text-xs font-medium transition-colors duration-150",
           collapsed ? "justify-center px-2" : "px-2.5",
-          item.isSubItem && !collapsed && "ml-6 py-1.5 text-xs",
+          item.isSubItem && !collapsed && "ml-6 py-1",
           isDisabled
             ? "cursor-not-allowed opacity-50 text-stone-400 dark:text-stone-500"
             : isActive
@@ -279,14 +293,14 @@ function SidebarNav({ onNavigate, collapsed }: { onNavigate?: () => void; collap
                 <button
                   type="button"
                   onClick={() => setAdvancedExpanded((prev) => !prev)}
-                  className="mb-1.5 mt-4 first:mt-0 flex w-full items-center justify-between rounded-md px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600 dark:text-stone-500 dark:hover:bg-[#171b1f] dark:hover:text-[#a8b0ba]"
+                  className="mb-1.5 mt-4 first:mt-0 flex w-full items-center justify-between rounded-md px-2.5 py-1 text-xs font-semibold uppercase tracking-widest text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600 dark:text-stone-500 dark:hover:bg-[#171b1f] dark:hover:text-[#a8b0ba]"
                   aria-expanded={advancedExpanded}
                 >
                   <span>Advanced</span>
                   <ChevronRight className={cn("h-3 w-3 transition-transform", advancedExpanded && "rotate-90")} />
                 </button>
               ) : (
-                <div className="mb-1.5 mt-4 first:mt-0 px-2.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-stone-400 dark:text-stone-500">
+                <div className="mb-1.5 mt-4 first:mt-0 px-2.5 text-xs font-semibold uppercase tracking-widest text-stone-400 dark:text-stone-500">
                   {item.group}
                 </div>
               )
@@ -296,11 +310,11 @@ function SidebarNav({ onNavigate, collapsed }: { onNavigate?: () => void; collap
             )}
             {shouldHideAdvancedItem ? null : isDisabled ? (
               <span className={linkClass} aria-disabled>
-                <Icon className="h-3.5 w-3.5 shrink-0 opacity-60" />
+                <Icon className="h-3 w-3 shrink-0 opacity-60" />
                 {!collapsed && (
                   <>
                     <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                    <span className="shrink-0 whitespace-nowrap rounded-full border border-border bg-muted/50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                    <span className="shrink-0 whitespace-nowrap rounded-full border border-border bg-muted/50 px-1.5 py-0.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
                       Soon
                     </span>
                   </>
@@ -308,13 +322,13 @@ function SidebarNav({ onNavigate, collapsed }: { onNavigate?: () => void; collap
               </span>
             ) : (
               (isSkillsParent || isAgentsParent || isCronParent) && !collapsed ? (
-                <div className={linkClass}>
+                <div className={linkClass} data-tour={tourId}>
                   <Link
                     href={item.href || `/${item.section}`}
                     onClick={onNavigate}
                     className="flex min-w-0 flex-1 items-center gap-2.5"
                   >
-                    <Icon className="h-3.5 w-3.5 shrink-0" />
+                    <Icon className="h-3 w-3 shrink-0" />
                     <span className="flex-1">{item.label}</span>
                   </Link>
                   <button
@@ -352,17 +366,18 @@ function SidebarNav({ onNavigate, collapsed }: { onNavigate?: () => void; collap
                   href={item.href || `/${item.section}`}
                   onClick={onNavigate}
                   className={linkClass}
+                  data-tour={tourId}
                   title={collapsed ? item.label : undefined}
                 >
                   <span className="relative inline-flex shrink-0">
-                    <Icon className="h-3.5 w-3.5" />
+                    <Icon className="h-3 w-3" />
                     {collapsed && showBadge && (
                     <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-stone-900 ring-2 ring-sidebar dark:bg-stone-100" title={`${chatUnread} unread`} aria-hidden />
                   )}
                 </span>
                 {!collapsed && <span className="flex-1">{item.label}</span>}
                 {!collapsed && item.beta && (
-                    <span className="shrink-0 rounded-sm bg-stone-100 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-stone-400 dark:bg-[#1c2128] dark:text-[#5a6270]">
+                    <span className="shrink-0 rounded-sm bg-stone-100 px-1.5 py-0.5 font-mono text-xs font-semibold uppercase tracking-wider text-stone-400 dark:bg-[#1c2128] dark:text-[#5a6270]">
                       beta
                     </span>
                   )}
@@ -492,6 +507,7 @@ export function Sidebar() {
 
       {/* Sidebar — always visible on desktop, slide-in drawer on mobile */}
       <aside
+        data-tour="sidebar"
         style={expandedWidthStyle}
         className={cn(
           "relative flex h-full shrink-0 flex-col transition-[width,transform] duration-200 ease-in-out",
@@ -527,11 +543,11 @@ export function Sidebar() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-bold tracking-tight text-stone-900 dark:text-[#f5f7fa]">
+                    <span className="text-xs font-bold tracking-tight text-stone-900 dark:text-[#f5f7fa]">
                       Mission Control
                     </span>
                     {commitHash && (
-                      <span className="shrink-0 rounded-full bg-stone-100 px-2 py-0.5 text-[10px] font-mono font-medium text-stone-500 dark:bg-[#171a1d] dark:text-[#7a8591]">
+                      <span className="shrink-0 rounded-full bg-stone-100 px-1.5 py-0.5 text-xs font-mono font-medium text-stone-500 dark:bg-[#171a1d] dark:text-[#7a8591]">
                         {commitHash}
                       </span>
                     )}
@@ -551,7 +567,7 @@ export function Sidebar() {
             onClick={toggleCollapsed}
             className={cn(
               "flex w-full items-center rounded-md py-1.5 text-stone-400 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-700 dark:text-[#7a8591] dark:hover:bg-[#171b1f] dark:hover:text-[#d6dce3]",
-              collapsed ? "justify-center px-0" : "gap-2 px-2"
+              collapsed ? "justify-center px-0" : "justify-start px-2.5"
             )}
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -559,10 +575,7 @@ export function Sidebar() {
             {collapsed ? (
               <ChevronRight className="h-4 w-4 shrink-0" />
             ) : (
-              <>
-                <ChevronLeft className="h-4 w-4 shrink-0" />
-                <span className="text-xs font-medium">Collapse</span>
-              </>
+              <ChevronLeft className="h-4 w-4 shrink-0" />
             )}
           </button>
         </div>
