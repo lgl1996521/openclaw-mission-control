@@ -43,6 +43,7 @@ import {
   Radio,
 } from "lucide-react";
 import { getChatUnreadCount, subscribeChatStore } from "@/lib/chat-store";
+import { useTranslation } from "@/components/language-provider";
 
 type NavItem = {
   section: string;
@@ -58,85 +59,7 @@ type NavItem = {
 
 const isAgentbayHosting = process.env.NEXT_PUBLIC_AGENTBAY_HOSTED === "true";
 
-const defaultNavItems: NavItem[] = [
-  // ── Overview ──
-  { group: "Overview", section: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-  { section: "activity", label: "Activity", icon: Activity, href: "/activity" },
-  { section: "usage", label: "Usage", icon: BarChart3, href: "/usage" },
-  // ── Agents ──
-  { group: "Agents", section: "agents", label: "Agents", icon: Users, href: "/agents" },
-  { section: "agents", label: "Subagents", icon: Users2, href: "/agents?tab=subagents", tab: "subagents", isSubItem: true },
-  { section: "agents", label: "Models", icon: Cpu, href: "/agents?tab=models", tab: "models", isSubItem: true },
-  { section: "chat", label: "Chat", icon: MessageCircle, href: "/chat" },
-  { section: "sessions", label: "Sessions", icon: MessageSquare, href: "/sessions" },
-  // ── Work ──
-  { group: "Work", section: "tasks", label: "Tasks", icon: ListChecks, href: "/tasks" },
-  ...(!isAgentbayHosting ? [{ section: "calendar", label: "Calendar", icon: Calendar, href: "/calendar", beta: true } as NavItem] : []),
-  ...(!isAgentbayHosting ? [{ section: "integrations", label: "Integrations", icon: Puzzle, href: "/integrations", beta: true } as NavItem] : []),
-  { section: "cron", label: "Cron Jobs", icon: Clock, href: "/cron" },
-  { section: "cron", label: "Heartbeat", icon: Heart, href: "/heartbeat", tab: "heartbeat", isSubItem: true },
-  { section: "skills", label: "Skills", icon: Wrench, href: "/skills" },
-  { section: "skills", label: "ClawHub", icon: Package, href: "/skills?tab=clawhub", tab: "clawhub", isSubItem: true },
-  // ── Knowledge ──
-  { group: "Knowledge", section: "memory", label: "Memory", icon: Brain, href: "/memory" },
-  { section: "docs", label: "Documents", icon: FolderOpen, href: "/documents" },
-  { section: "vectors", label: "Vector DB", icon: Database, href: "/vectors" },
-  // ── Configure ──
-  { section: "accounts", label: "API Keys", icon: KeyRound, href: "/accounts" },
-  { section: "channels", label: "Channels", icon: Radio, href: "/channels" },
-  { section: "security", label: "Security", icon: ShieldCheck, href: "/security" },
-  { section: "hooks", label: "Hooks", icon: Webhook, href: "/hooks" },
-  { section: "settings", label: "Preferences", icon: Settings2, href: "/settings" },
-  // ── System ──
-  ...(!isAgentbayHosting ? [{ section: "doctor", label: "Doctor", icon: Stethoscope, href: "/doctor", group: "System", beta: true } as NavItem] : []),
-  { group: isAgentbayHosting ? "System" : undefined, section: "terminal", label: "Terminal", icon: SquareTerminal, href: "/terminal" },
-  { section: "logs", label: "Logs", icon: Terminal, href: "/logs" },
-  { section: "browser", label: "Browser Relay", icon: Globe, href: "/browser" },
-  { section: "audio", label: "Audio & Voice", icon: Volume2, href: "/audio" },
-  { section: "search", label: "Web Search", icon: Search, href: "/search" },
-  ...(!isAgentbayHosting ? [{ section: "tailscale", label: "Tailscale", icon: Waypoints, href: "/tailscale", beta: true } as NavItem] : []),
-  { section: "config", label: "Config", icon: Settings, href: "/config" },
-];
 
-const hostedNavItems: NavItem[] = [
-  // ── Core ──
-  { group: "Core", section: "chat", label: "Chat", icon: MessageCircle, href: "/chat" },
-  { section: "channels", label: "Channels", icon: Radio, href: "/channels" },
-  { section: "tasks", label: "Tasks", icon: ListChecks, href: "/tasks" },
-  { section: "skills", label: "Skills", icon: Wrench, href: "/skills" },
-  { section: "accounts", label: "API Keys", icon: KeyRound, href: "/accounts" },
-  { section: "help", label: "Help & Support", icon: HelpCircle, href: "/help" },
-  // ── Overview ──
-  { group: "Overview", section: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-  { section: "activity", label: "Activity", icon: Activity, href: "/activity" },
-  { section: "usage", label: "Usage", icon: BarChart3, href: "/usage" },
-  // ── Agents ──
-  { group: "Agents", section: "agents", label: "Agents", icon: Users, href: "/agents" },
-  { section: "agents", label: "Models", icon: Cpu, href: "/agents?tab=models", tab: "models", isSubItem: true },
-  { section: "sessions", label: "Sessions", icon: MessageSquare, href: "/sessions" },
-  // ── Work ──
-  { group: "Work", section: "cron", label: "Cron Jobs", icon: Clock, href: "/cron" },
-  // ── Knowledge ──
-  { group: "Knowledge", section: "memory", label: "Memory", icon: Brain, href: "/memory" },
-  { section: "docs", label: "Documents", icon: FolderOpen, href: "/documents" },
-  // ── Configure ──
-  { group: "Configure", section: "settings", label: "Preferences", icon: Settings2, href: "/settings" },
-  // ── Advanced ──
-  { group: "Advanced", section: "agents", label: "Subagents", icon: Users2, href: "/agents?tab=subagents", tab: "subagents" },
-  { section: "skills", label: "ClawHub", icon: Package, href: "/skills?tab=clawhub", tab: "clawhub", group: "Advanced" },
-  { section: "cron", label: "Heartbeat", icon: Heart, href: "/heartbeat", tab: "heartbeat", group: "Advanced" },
-  { section: "vectors", label: "Vector DB", icon: Database, href: "/vectors", group: "Advanced" },
-  { section: "security", label: "Security", icon: ShieldCheck, href: "/security", group: "Advanced" },
-  { section: "hooks", label: "Hooks", icon: Webhook, href: "/hooks", group: "Advanced" },
-  { section: "terminal", label: "Terminal", icon: SquareTerminal, href: "/terminal", group: "Advanced" },
-  { section: "logs", label: "Logs", icon: Terminal, href: "/logs", group: "Advanced" },
-  { section: "browser", label: "Browser Relay", icon: Globe, href: "/browser", group: "Advanced" },
-  { section: "audio", label: "Audio & Voice", icon: Volume2, href: "/audio", group: "Advanced" },
-  { section: "search", label: "Web Search", icon: Search, href: "/search", group: "Advanced" },
-  { section: "config", label: "Config", icon: Settings, href: "/config", group: "Advanced" },
-];
-
-const navItems = isAgentbayHosting ? hostedNavItems : defaultNavItems;
 
 const SIDEBAR_COLLAPSED_KEY = "sidebar_collapsed";
 const SIDEBAR_WIDTH_KEY = "sidebar_width";
@@ -205,7 +128,89 @@ function deriveTabFromPath(pathname: string): string | null {
 }
 
 function SidebarNav({ onNavigate, collapsed }: { onNavigate?: () => void; collapsed?: boolean }) {
+  const { t, language, setLanguage } = useTranslation();
   const searchParams = useSearchParams();
+
+  const defaultNavItems: NavItem[] = [
+    // ── Overview ──
+    { group: t("sidebar.overview"), section: "dashboard", label: t("sidebar.dashboard"), icon: LayoutDashboard, href: "/dashboard" },
+    { section: "activity", label: t("sidebar.activity"), icon: Activity, href: "/activity" },
+    { section: "usage", label: t("sidebar.usage"), icon: BarChart3, href: "/usage" },
+    // ── Agents ──
+    { group: t("sidebar.agents_group"), section: "agents", label: t("sidebar.agents"), icon: Users, href: "/agents" },
+    { section: "agents", label: t("sidebar.subagents"), icon: Users2, href: "/agents?tab=subagents", tab: "subagents", isSubItem: true },
+    { section: "agents", label: t("sidebar.models"), icon: Cpu, href: "/agents?tab=models", tab: "models", isSubItem: true },
+    { section: "chat", label: t("sidebar.chat"), icon: MessageCircle, href: "/chat" },
+    { section: "sessions", label: t("sidebar.sessions"), icon: MessageSquare, href: "/sessions" },
+    // ── Work ──
+    { group: t("sidebar.work"), section: "tasks", label: t("sidebar.tasks"), icon: ListChecks, href: "/tasks" },
+    ...(!isAgentbayHosting ? [{ section: "calendar", label: t("sidebar.calendar"), icon: Calendar, href: "/calendar", beta: true } as NavItem] : []),
+    ...(!isAgentbayHosting ? [{ section: "integrations", label: t("sidebar.integrations"), icon: Puzzle, href: "/integrations", beta: true } as NavItem] : []),
+    { section: "cron", label: t("sidebar.cron_jobs"), icon: Clock, href: "/cron" },
+    { section: "cron", label: t("sidebar.heartbeat"), icon: Heart, href: "/heartbeat", tab: "heartbeat", isSubItem: true },
+    { section: "skills", label: t("sidebar.skills"), icon: Wrench, href: "/skills" },
+    { section: "skills", label: t("sidebar.clawhub"), icon: Package, href: "/skills?tab=clawhub", tab: "clawhub", isSubItem: true },
+    // ── Knowledge ──
+    { group: t("sidebar.knowledge"), section: "memory", label: t("sidebar.memory"), icon: Brain, href: "/memory" },
+    { section: "docs", label: t("sidebar.documents"), icon: FolderOpen, href: "/documents" },
+    { section: "vectors", label: t("sidebar.vector_db"), icon: Database, href: "/vectors" },
+    // ── Configure ──
+    { section: "accounts", label: t("sidebar.api_keys"), icon: KeyRound, href: "/accounts" },
+    { section: "channels", label: t("sidebar.channels"), icon: Radio, href: "/channels" },
+    { section: "security", label: t("sidebar.security"), icon: ShieldCheck, href: "/security" },
+    { section: "hooks", label: t("sidebar.hooks"), icon: Webhook, href: "/hooks" },
+    { section: "settings", label: t("sidebar.preferences"), icon: Settings2, href: "/settings" },
+    // ── System ──
+    ...(!isAgentbayHosting ? [{ section: "doctor", label: t("sidebar.doctor"), icon: Stethoscope, href: "/doctor", group: t("sidebar.system"), beta: true } as NavItem] : []),
+    { group: isAgentbayHosting ? t("sidebar.system") : undefined, section: "terminal", label: t("sidebar.terminal"), icon: SquareTerminal, href: "/terminal" },
+    { section: "logs", label: t("sidebar.logs"), icon: Terminal, href: "/logs" },
+    { section: "browser", label: t("sidebar.browser_relay"), icon: Globe, href: "/browser" },
+    { section: "audio", label: t("sidebar.audio_voice"), icon: Volume2, href: "/audio" },
+    { section: "search", label: t("sidebar.web_search"), icon: Search, href: "/search" },
+    ...(!isAgentbayHosting ? [{ section: "tailscale", label: t("sidebar.tailscale"), icon: Waypoints, href: "/tailscale", beta: true } as NavItem] : []),
+    { section: "config", label: t("sidebar.config"), icon: Settings, href: "/config" },
+  ];
+
+  const hostedNavItems: NavItem[] = [
+    // ── Core ──
+    { group: t("sidebar.core"), section: "chat", label: t("sidebar.chat"), icon: MessageCircle, href: "/chat" },
+    { section: "channels", label: t("sidebar.channels"), icon: Radio, href: "/channels" },
+    { section: "tasks", label: t("sidebar.tasks"), icon: ListChecks, href: "/tasks" },
+    { section: "skills", label: t("sidebar.skills"), icon: Wrench, href: "/skills" },
+    { section: "accounts", label: t("sidebar.api_keys"), icon: KeyRound, href: "/accounts" },
+    { section: "help", label: t("sidebar.help_support"), icon: HelpCircle, href: "/help" },
+    // ── Overview ──
+    { group: t("sidebar.overview"), section: "dashboard", label: t("sidebar.dashboard"), icon: LayoutDashboard, href: "/dashboard" },
+    { section: "activity", label: t("sidebar.activity"), icon: Activity, href: "/activity" },
+    { section: "usage", label: t("sidebar.usage"), icon: BarChart3, href: "/usage" },
+    // ── Agents ──
+    { group: t("sidebar.agents_group"), section: "agents", label: t("sidebar.agents"), icon: Users, href: "/agents" },
+    { section: "agents", label: t("sidebar.models"), icon: Cpu, href: "/agents?tab=models", tab: "models", isSubItem: true },
+    { section: "sessions", label: t("sidebar.sessions"), icon: MessageSquare, href: "/sessions" },
+    // ── Work ──
+    { group: t("sidebar.work"), section: "cron", label: t("sidebar.cron_jobs"), icon: Clock, href: "/cron" },
+    // ── Knowledge ──
+    { group: t("sidebar.knowledge"), section: "memory", label: t("sidebar.memory"), icon: Brain, href: "/memory" },
+    { section: "docs", label: t("sidebar.documents"), icon: FolderOpen, href: "/documents" },
+    // ── Configure ──
+    { group: t("sidebar.configure"), section: "settings", label: t("sidebar.preferences"), icon: Settings2, href: "/settings" },
+    // ── Advanced ──
+    { group: t("sidebar.advanced"), section: "agents", label: t("sidebar.subagents"), icon: Users2, href: "/agents?tab=subagents", tab: "subagents" },
+    { section: "skills", label: t("sidebar.clawhub"), icon: Package, href: "/skills?tab=clawhub", tab: "clawhub", group: t("sidebar.advanced") },
+    { section: "cron", label: t("sidebar.heartbeat"), icon: Heart, href: "/heartbeat", tab: "heartbeat", group: t("sidebar.advanced") },
+    { section: "vectors", label: t("sidebar.vector_db"), icon: Database, href: "/vectors", group: t("sidebar.advanced") },
+    { section: "security", label: t("sidebar.security"), icon: ShieldCheck, href: "/security", group: t("sidebar.advanced") },
+    { section: "hooks", label: t("sidebar.hooks"), icon: Webhook, href: "/hooks", group: t("sidebar.advanced") },
+    { section: "terminal", label: t("sidebar.terminal"), icon: SquareTerminal, href: "/terminal", group: t("sidebar.advanced") },
+    { section: "logs", label: t("sidebar.logs"), icon: Terminal, href: "/logs", group: t("sidebar.advanced") },
+    { section: "browser", label: t("sidebar.browser_relay"), icon: Globe, href: "/browser", group: t("sidebar.advanced") },
+    { section: "audio", label: t("sidebar.audio_voice"), icon: Volume2, href: "/audio", group: t("sidebar.advanced") },
+    { section: "search", label: t("sidebar.web_search"), icon: Search, href: "/search", group: t("sidebar.advanced") },
+    { section: "config", label: t("sidebar.config"), icon: Settings, href: "/config", group: t("sidebar.advanced") },
+  ];
+
+  const navItems = isAgentbayHosting ? hostedNavItems : defaultNavItems;
+
   const pathname = usePathname();
   const sectionFromPath = deriveSectionFromPath(pathname);
   const sectionFromQuery = searchParams.get("section") || "dashboard";
@@ -238,9 +243,9 @@ function SidebarNav({ onNavigate, collapsed }: { onNavigate?: () => void; collap
   return (
     <nav className={cn("flex flex-1 flex-col gap-0.5 overflow-y-auto pt-2", collapsed ? "px-2" : "px-3")}>
       {navItems.map((item, index) => {
-        const isSkillsParent = item.section === "skills" && item.label === "Skills";
-        const isAgentsParent = item.section === "agents" && item.label === "Agents";
-        const isCronParent = item.section === "cron" && item.label === "Cron Jobs";
+        const isSkillsParent = item.section === "skills" && item.label === t("sidebar.skills");
+        const isAgentsParent = item.section === "agents" && item.label === t("sidebar.agents");
+        const isCronParent = item.section === "cron" && item.label === t("sidebar.cron_jobs");
         const isAdvancedItem = isAgentbayHosting && item.group === "Advanced";
         const previousGroup = index > 0 ? navItems[index - 1]?.group : undefined;
         const showGroupHeader = item.group && item.group !== previousGroup;
@@ -296,7 +301,7 @@ function SidebarNav({ onNavigate, collapsed }: { onNavigate?: () => void; collap
                   className="mb-1.5 mt-4 first:mt-0 flex w-full items-center justify-between rounded-md px-2.5 py-1 text-xs font-semibold uppercase tracking-widest text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600 dark:text-stone-500 dark:hover:bg-[#171b1f] dark:hover:text-[#a8b0ba]"
                   aria-expanded={advancedExpanded}
                 >
-                  <span>Advanced</span>
+                  <span>{t("sidebar.advanced")}</span>
                   <ChevronRight className={cn("h-3 w-3 transition-transform", advancedExpanded && "rotate-90")} />
                 </button>
               ) : (
@@ -315,7 +320,7 @@ function SidebarNav({ onNavigate, collapsed }: { onNavigate?: () => void; collap
                   <>
                     <span className="min-w-0 flex-1 truncate">{item.label}</span>
                     <span className="shrink-0 whitespace-nowrap rounded-full border border-border bg-muted/50 px-1.5 py-0.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Soon
+                      {t("common.soon")}
                     </span>
                   </>
                 )}
@@ -397,6 +402,7 @@ function SidebarNav({ onNavigate, collapsed }: { onNavigate?: () => void; collap
 }
 
 export function Sidebar() {
+  const { language, setLanguage, t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -492,7 +498,7 @@ export function Sidebar() {
         type="button"
         onClick={() => setMobileOpen(true)}
         className="fixed left-3 top-3 z-50 flex h-9 w-9 items-center justify-center rounded-lg glass-strong text-foreground md:hidden"
-        aria-label="Open menu"
+        aria-label={t("common.open_menu")}
       >
         <Menu className="h-5 w-5" />
       </button>
@@ -523,7 +529,7 @@ export function Sidebar() {
             type="button"
             onClick={() => setMobileOpen(false)}
             className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground"
-            aria-label="Close menu"
+            aria-label={t("common.close_menu")}
           >
             <X className="h-5 w-5" />
           </button>
@@ -560,6 +566,25 @@ export function Sidebar() {
         <Suspense fallback={<div className="flex-1" />}>
           <SidebarNav onNavigate={closeMobile} collapsed={collapsed} />
         </Suspense>
+        {/* Language Switcher */}
+        <div className={cn("border-t border-stone-200 dark:border-[#23282e]", collapsed ? "px-2 py-2" : "px-3 py-2")}>
+          <button
+            type="button"
+            onClick={() => setLanguage(language === "en" ? "zh" : "en")}
+            className={cn(
+              "flex w-full items-center rounded-md py-1.5 text-stone-400 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-700 dark:text-[#7a8591] dark:hover:bg-[#171b1f] dark:hover:text-[#d6dce3]",
+              collapsed ? "justify-center px-0" : "justify-start px-2.5"
+            )}
+            title={language === "en" ? t("common.switch_to_chinese") : t("common.switch_to_english")}
+          >
+            <Globe className="h-4 w-4 shrink-0" />
+            {!collapsed && (
+              <span className="ml-3 text-sm font-medium">
+                {language === "en" ? "English" : "简体中文"}
+              </span>
+            )}
+          </button>
+        </div>
         {/* Collapse / expand toggle — desktop only */}
         <div className={cn("hidden border-t border-stone-200 dark:border-[#23282e] md:block", collapsed ? "px-2 py-2" : "px-3 py-2")}>
           <button
@@ -569,8 +594,8 @@ export function Sidebar() {
               "flex w-full items-center rounded-md py-1.5 text-stone-400 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-700 dark:text-[#7a8591] dark:hover:bg-[#171b1f] dark:hover:text-[#d6dce3]",
               collapsed ? "justify-center px-0" : "justify-start px-2.5"
             )}
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={collapsed ? t("common.expand_sidebar") : t("common.collapse_sidebar")}
+            aria-label={collapsed ? t("common.expand_sidebar") : t("common.collapse_sidebar")}
           >
             {collapsed ? (
               <ChevronRight className="h-4 w-4 shrink-0" />

@@ -43,6 +43,7 @@ import {
   withTimeFormat,
 } from "@/lib/time-format-preference";
 import { useGatewayStatusStore } from "@/lib/gateway-status-store";
+import { useTranslation } from "@/components/language-provider";
 
 /* ── types ────────────────────────────────────────── */
 
@@ -120,23 +121,23 @@ function formatDuration(ms: number | null): string {
   return `${(ms / 60000).toFixed(1)}m`;
 }
 
-function formatAgo(ms: number): string {
+function formatAgo(ms: number, t: (p: string) => string): string {
   if (!ms) return "—";
   const diff = Date.now() - ms;
-  if (diff < 0) return "just now";
+  if (diff < 0) return t("dashboard.just_now");
   const secs = Math.floor(diff / 1000);
-  if (secs < 60) return `${secs}s ago`;
+  if (secs < 60) return `${secs}s ${t("dashboard.ago")}`;
   const mins = Math.floor(secs / 60);
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 60) return `${mins}m ${t("dashboard.ago")}`;
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
+  if (hours < 24) return `${hours}h ${t("dashboard.ago")}`;
+  return `${Math.floor(hours / 24)}d ${t("dashboard.ago")}`;
 }
 
-function formatCountdown(ms: number | null): string {
+function formatCountdown(ms: number | null, t: (p: string) => string): string {
   if (!ms) return "—";
   const diff = ms - Date.now();
-  if (diff <= 0) return "overdue";
+  if (diff <= 0) return t("dashboard.overdue");
   const secs = Math.floor(diff / 1000);
   if (secs < 60) return `${secs}s`;
   const mins = Math.floor(secs / 60);
@@ -654,6 +655,7 @@ function OcStatMini({
 /* ── component ───────────────────────────────────── */
 
 export function DashboardView() {
+  const { t } = useTranslation();
   const router = useRouter();
   const timeFormat = useSyncExternalStore(
     subscribeTimeFormatPreference,
@@ -816,8 +818,8 @@ export function DashboardView() {
   return (
     <SectionLayout>
       <SectionHeader
-        title="Dashboard"
-        description="Live overview of gateway health, agent activity, cron jobs, and system status."
+        title={t("dashboard.dashboard_title")}
+        description={t("dashboard.dashboard_desc")}
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-600 dark:bg-stone-800 dark:text-stone-300">
@@ -837,14 +839,14 @@ export function DashboardView() {
             <StatCard
               icon={Users2}
               value={live.agents.length}
-              label="Agents"
+              label={t("dashboard.agents")}
               iconClassName="text-stone-300 dark:text-[#66717d]"
               href="/agents"
             />
             <StatCard
               icon={Activity}
               value={formatTokens(live.agents.reduce((s, a) => s + a.totalTokens, 0))}
-              label="Tokens Used"
+              label={t("dashboard.tokens_used")}
               iconClassName="text-stone-300 dark:text-[#66717d]"
               href="/sessions"
             />
@@ -1092,7 +1094,7 @@ export function DashboardView() {
                         <div className="flex items-center gap-3 text-xs text-muted-foreground/60">
                           <span>{agent.sessionCount} session{agent.sessionCount !== 1 ? "s" : ""}</span>
                           <span>{formatTokens(agent.totalTokens)} tokens</span>
-                          <span>Active {formatAgo(agent.lastActivity)}</span>
+                          <span>Active {formatAgo(agent.lastActivity, t)}</span>
                         </div>
                       </div>
                       <span className={cn(
@@ -1152,7 +1154,7 @@ export function DashboardView() {
               <div className="space-y-2.5">
                 {live.cron.jobs.map((job) => {
                   const progress = cronProgress(job);
-                  const countdown = formatCountdown(job.nextRunAtMs);
+                  const countdown = formatCountdown(job.nextRunAtMs, t);
                   return (
                     <div key={job.id} className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm dark:border-[#2c343d] dark:bg-[#171a1d]">
                       <div className="flex items-center gap-2.5">
@@ -1179,7 +1181,7 @@ export function DashboardView() {
                             {countdown}
                           </p>
                           <p className="text-xs text-muted-foreground/50">
-                            ran {formatAgo(job.lastRunAtMs || 0)} ({formatDuration(job.lastDurationMs)})
+                            ran {formatAgo(job.lastRunAtMs, t)} ({formatDuration(job.lastDurationMs)})
                           </p>
                         </div>
                       </div>

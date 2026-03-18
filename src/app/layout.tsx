@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/sidebar";
 import { Header, AgentChatPanel } from "@/components/header";
 import { KeyboardShortcuts } from "@/components/keyboard-shortcuts";
 import { ThemeProvider } from "@/components/theme-provider";
+import { LanguageProvider } from "@/components/language-provider";
 import { ChatNotificationToast } from "@/components/chat-notification-toast";
 
 import { SetupGate } from "@/components/setup-gate";
@@ -115,6 +116,7 @@ export default function RootLayout({
         className={`${inter.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
+          <LanguageProvider>
           <SetupGate>
             <KeyboardShortcuts />
             <div className="flex h-screen overflow-hidden bg-stone-50 text-stone-900 dark:bg-[#101214] dark:text-stone-100">
@@ -138,6 +140,7 @@ export default function RootLayout({
             <UsageAlertMonitor />
             <ToastRenderer />
           </SetupGate>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

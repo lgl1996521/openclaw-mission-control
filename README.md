@@ -76,6 +76,9 @@ Think of it like the dashboard on your car. It shows you speed, fuel, and engine
 ### Built-In Terminal
 **Terminal** gives you a full command line right in the dashboard — multiple tabs, color support, no need to switch windows.
 
+### Internationalization (i18n)
+**Multi-language support** — Now includes a Chinese (Simplified) version. Switch languages easily from the sidebar.
+
 ### Connect to Messaging
 **Channels** configures your agents' connections to Telegram, Discord, WhatsApp, Signal, and Slack — with QR code pairing where supported.
 
