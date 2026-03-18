@@ -45,7 +45,9 @@ yarn-error.log*
 next-env.d.ts
 
 # Others
-*.md
+# *.md (Allowed README files)
+!README.md
+!README_zh.md
 .claude/
 *.png
 /e2e/

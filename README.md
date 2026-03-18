@@ -2,6 +2,8 @@
 
 # Mission Control
 
+[简体中文](./README_zh.md) | English
+
 **Your command center for [OpenClaw](https://github.com/openclaw). See everything, control everything, from one screen.**
 
 Monitor your AI agents in real time. Chat with them. Schedule jobs. Track costs. Manage memory. All from your browser, all running on your machine.
